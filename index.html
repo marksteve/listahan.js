@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>listahan.js</title>
+<link href="css/normalize.css" rel="stylesheet">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script src="listahan.js"></script>
+<style>
+    section {
+        margin: 0 auto;
+        width: 480px;
+    }
+    body {
+        font: 12px sans-serif;
+    }
+    code {
+        background: #eee;
+        display: block;
+        height: 20em;
+        overflow-y: auto;
+        padding: 1em;
+        white-space: pre;
+    }
+    .submenu {
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .submenu li {
+        cursor: pointer;
+        line-height: 24px;
+        padding: 0 1em;
+        white-space: nowrap;
+    }
+    .submenu li:hover, .submenu li.active {
+        background: #eee;
+    }
+    .submenu li span {
+        float: right;
+        font-size: 80%;
+        line-height: 24px;
+        margin-left: 1em;
+    }
+</style>
+</head>
+<body>
+<a href="https://github.com/marksteve/listahan.js"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+<section>
+
+<!-- README.md -->
+<h1>listahan.js</h1>
+
+<p>A really simple jQuery menu plugin.</p>
+
+<h2>Features</h2>
+
+<ul>
+<li>Minimal configuration</li>
+<li>Moves/resizes to available visible space</li>
+<li>Callbacks</li>
+</ul>
+
+
+<h2>TODO</h2>
+
+<ul>
+<li>Horizontal resizing/moving</li>
+<li>Improve data format and parsing</li>
+<li>Improve API</li>
+</ul>
+
+
+<h2>License</h2>
+
+<p><a href="http://marksteve.mit-license.org">MIT License</a></p>
+<!-- /README.md -->
+
+<h2>Demo</h2>
+<p><a href="#" id="demo-link">Show menu</a></p>
+<code id="demo-source"></code>
+
+</section>
+<script id="demo-script">
+var data = [
+    {
+        id: 1,
+        parent: 0,
+        title: 'Test'
+    },
+    {
+        id: 2,
+        parent: 0,
+        title: 'Test'
+    },
+    {
+        id: 200,
+        parent: 2,
+        title: 'Test 2'
+    },
+    {
+        id: 3,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 4,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 5,
+        parent: 3,
+        title: 'Test 3'
+    },
+    {
+        id: 6,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 7,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 8,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 9,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 10,
+        parent: 1,
+        title: 'Test 2'
+    },
+];
+
+$(function() {
+    $('#demo-link').listahan({
+        data: data,
+        $container: $('<div/>').css('position', 'absolute'),
+        menuOpen: function($container) {
+            $container.offset({
+                top: Math.floor(Math.random() * 0.5  * $(document).height()),
+                left: Math.floor(Math.random() * 0.5 * $(document).width())
+            });
+        },
+        menuItemHTML: function(item, $submenu, $submenus) {
+            var html = item.title;
+            if (item.hasChildren) {
+                html += '<span>&#9658;</span>';
+            }
+            return html;
+        },
+        menuItemClick: function(item) {
+            alert(item.title);
+        }
+    });
+});
+
+</script>
+<script>
+$(function() {
+    $('#demo-source').text($.trim($('#demo-script').text()));
+});
+</script>
+</body>
+</html>
