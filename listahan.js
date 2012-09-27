@@ -138,7 +138,6 @@ $.fn.listahan = function(optionsOrMethod) {
             })
             .on('click', function(e) {
                 // Menu item click callback
-                e.stopPropagation();
                 var menuItemClick = $.proxy(options.menuItemClick, this);
                 menuItemClick(item, $submenu, $submenus, e);
             })
