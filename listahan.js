@@ -167,7 +167,8 @@ $.fn.listahan = function(optionsOrMethod) {
                 // Hide previously shown submenus
                 hideMenus(options.root);
                 // Menu open callback
-                options.menuOpen(options.$container);
+                var menuOpen = $.proxy(options.menuOpen, this);
+                menuOpen(options.$container);
                 // Append root menu
                 if (!$root.is(':visible')) {
                     options.$container.append($root)
