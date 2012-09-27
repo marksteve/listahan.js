@@ -1,8 +1,15 @@
 (function($) {
 
-$.fn.listahan = function(options) {
-    options = $.extend({
-        $container: $('<div/>'),
+$.fn.listahan = function(optionsOrMethod) {
+    // Method call
+    if (typeof optionsOrMethod == 'string') {
+        return this.each(function() {
+            $(this).trigger(optionsOrMethod + '.listahan');
+        });
+    }
+
+    var options = $.extend({
+        $container: $('<div/>').attr('id', 'listahan'),
         root: 0,
         showDelay: 250,
         distance: 0,
@@ -16,7 +23,7 @@ $.fn.listahan = function(options) {
         },
         menuItemClick: function(item, $submenu, $submenus, e) {
         }
-    }, options);
+    }, optionsOrMethod);
 
     var $submenus = {};
     var parents = [];
@@ -133,34 +140,36 @@ $.fn.listahan = function(options) {
     });
 
     // Insert container
-    $('body').append(options.$container.hide());
-
-    // Hide container on click
-    $(document).on('click', function() {
-        options.$container.hide();
-    });
+    $('body').append(
+        options.$container
+            .css('position', 'absolute')
+            .hide()
+    );
 
     // Root menu
     var $root = $submenus[options.root]
-        .css('position', 'absolute')
-        .show();
+        .css('position', 'absolute');
 
     return this.each(function() {
-        var $el = $(this);
-        $el.on('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            // Hide previously shown submenus
-            hideMenus(options.root);
-            // Show root menu
-            options.$container
-                .append($root)
-                .show();
-            // Menu open callback
-            options.menuOpen(options.$container);
-        });
+        $(this)
+            .on('show.listahan', function(e) {
+                if (!$root.is(':visible')) {
+                    // Hide previously shown submenus
+                    hideMenus(options.root);
+                    // Show root menu
+                    options.$container
+                        .append($root)
+                        .show();
+                    // Menu open callback
+                    options.menuOpen(options.$container);
+                }
+            })
+            .on('hide.listahan', function(e) {
+                // Hide container
+                options.$container.hide();
+            });
     });
 
-    };
+};
 
 })(jQuery);

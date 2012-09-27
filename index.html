@@ -144,26 +144,36 @@ var data = [
 ];
 
 $(function() {
-    $('#demo-link').listahan({
-        data: data,
-        $container: $('<div/>').css('position', 'absolute'),
-        menuOpen: function($container) {
-            $container.offset({
-                top: Math.floor(Math.random() * 0.5  * $(document).height()),
-                left: Math.floor(Math.random() * 0.5 * $(document).width())
-            });
-        },
-        menuItemHTML: function(item, $submenu, $submenus) {
-            var html = item.title;
-            if (item.hasChildren) {
-                html += '<span>&#9658;</span>';
+    $('#demo-link')
+        .listahan({
+            data: data,
+            menuOpen: function($container) {
+                $container.offset({
+                    top: Math.floor(Math.random() * 0.5  * $(document).height()),
+                    left: Math.floor(Math.random() * 0.5 * $(document).width())
+                });
+            },
+            menuItemHTML: function(item, $submenu, $submenus) {
+                var html = item.title;
+                if (item.hasChildren) {
+                    html += '<span>&#9658;</span>';
+                }
+                return html;
+            },
+            menuItemClick: function(item) {
+                alert(item.title);
             }
-            return html;
-        },
-        menuItemClick: function(item) {
-            alert(item.title);
-        }
+        })
+        .on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).listahan('show');
+        });
+    // Hide container on click
+    $(document).on('click', function(e) {
+        $('#demo-link').listahan('hide');
     });
+
 });
 
 </script>
