@@ -185,8 +185,8 @@ var demo2 = [
 ];
 
 $(function() {
-    var $demo1 = $('#demo-1');
-    $demo1
+    var $demo1 = $('<div/>')
+        .appendTo('body')
         .listahan({
             menu: demo1,
             menuOpen: function($container) {
@@ -205,19 +205,20 @@ $(function() {
             menuItemClick: function(item) {
                 alert(item.title);
             }
-        })
+        });
+    $('#demo-1')
         .on('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            $(this).listahan('show');
+            $demo1.listahan('show');
         });
     $(document).on('click', function(e) {
         $demo1.listahan('hide');
     });
 
     var $parent = $('#demo-parent');
-    var $demo2 = $('#demo-2');
-    $demo2
+    var $demo2 = $('<div/>')
+        .appendTo('body')
         .listahan({
             menu: demo2,
             $parent: $parent,
@@ -228,10 +229,11 @@ $(function() {
                 $container.css('top', 50);
             }
         })
+    $('#demo-2')
         .on('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            $(this).listahan('show');
+            $demo2.listahan('show');
         });
     $parent.on('click', function(e) {
         $demo2.listahan('hide');

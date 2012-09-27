@@ -14,9 +14,9 @@ $.fn.listahan = function(optionsOrMethod) {
         showDelay: 250,
         distance: 0,
         submenuClass: 'submenu',
-        menuInit: function($container) {
+        menuInit: function($menu) {
         },
-        menuOpen: function($container) {
+        menuOpen: function($menu) {
         },
         menuItemHTML: function(item, $submenu, $submenus) {
             return item.title;
@@ -27,9 +27,7 @@ $.fn.listahan = function(optionsOrMethod) {
         }
     }, optionsOrMethod);
 
-    // Create container if none was passed
-    options.$container = options.$container || $('<div/>').addClass('listahan').appendTo('body');
-
+    var $menu = $(this);
     var $submenus = {};
     var parents = [];
     var menuTimeout;
@@ -90,7 +88,7 @@ $.fn.listahan = function(optionsOrMethod) {
                                 overflowY: 'hidden',
                                 height: 'auto'
                             })
-                            .appendTo(options.$container)
+                            .appendTo($menu)
                             .show();
                         var submenuBorderTop = parseInt($submenu.css('border-top-width'), 10);
                         var submenuBorderBot = parseInt($submenu.css('border-bottom-width'), 10);
@@ -147,8 +145,8 @@ $.fn.listahan = function(optionsOrMethod) {
             .appendTo($submenu);
     });
 
-    // Hide container initially
-    options.$container
+    // Hide menu initially
+    $menu
         .css('position', 'absolute')
         .hide()
 
@@ -157,28 +155,26 @@ $.fn.listahan = function(optionsOrMethod) {
         .css('position', 'absolute');
 
     // Menu init callback
-    options.menuInit(options.$container);
+    options.menuInit($menu);
 
-    return this.each(function() {
-        $(this)
-            .on('show.listahan', function(e) {
-                // Show container
-                options.$container.show();
-                // Hide previously shown submenus
-                hideMenus(options.root);
-                // Menu open callback
-                var menuOpen = $.proxy(options.menuOpen, this);
-                menuOpen(options.$container);
-                // Append root menu
-                if (!$root.is(':visible')) {
-                    options.$container.append($root)
-                }
-            })
-            .on('hide.listahan', function(e) {
-                // Hide container
-                options.$container.hide();
-            });
-    });
+    return $menu
+        .on('show.listahan', function(e) {
+            // Show menu
+            $menu.show();
+            // Hide previously shown submenus
+            hideMenus(options.root);
+            // Menu open callback
+            var menuOpen = $.proxy(options.menuOpen, this);
+            menuOpen($menu);
+            // Append root menu
+            if (!$root.is(':visible')) {
+                $menu.append($root)
+            }
+        })
+        .on('hide.listahan', function(e) {
+            // Hide menu
+            $menu.hide();
+        });
 
 };
 
