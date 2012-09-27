@@ -18,8 +18,8 @@ $.fn.listahan = function(optionsOrMethod) {
         },
         menuOpen: function($menu) {
         },
-        menuItemHTML: function(item, $submenu, $submenus) {
-            return item.title;
+        menuItemAdd: function(item, $submenu, $submenus) {
+            $(this).text(item.title);
         },
         menuItemActive: function(item, $submenu, $submenus) {
         },
@@ -56,13 +56,9 @@ $.fn.listahan = function(optionsOrMethod) {
         if ($.inArray(item.id, parents) > 0) {
             item.hasChildren = true;
         }
-        $('<li/>')
+        var $menuItem = $('<li/>')
             .attr('id', item.id)
             .attr('parent', item.parent)
-            .html(function() {
-                var menuItemHTML = $.proxy(options.menuItemHTML, this);
-                return menuItemHTML(item, $submenu, $submenus);
-            })
             .on('mouseenter', function(e) {
                 clearTimeout(menuTimeout);
                 var $el = $(this);
@@ -142,6 +138,9 @@ $.fn.listahan = function(optionsOrMethod) {
                 menuItemClick(item, $submenu, $submenus, e);
             })
             .appendTo($submenu);
+        // Menu item add callback
+        var menuItemAdd = $.proxy(options.menuItemAdd, $menuItem);
+        menuItemAdd(item, $submenu, $submenus);
     });
 
     // Hide menu initially

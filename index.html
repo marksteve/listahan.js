@@ -195,12 +195,12 @@ $(function() {
                     left: Math.floor(Math.random() * 0.5 * $(document).width())
                 });
             },
-            menuItemHTML: function(item, $submenu, $submenus) {
+            menuItemAdd: function(item, $submenu, $submenus) {
                 var html = item.title;
                 if (item.hasChildren) {
                     html += '<span>&#9658;</span>';
                 }
-                return html;
+                $(this).html(html);
             },
             menuItemClick: function(item) {
                 alert(item.title);
