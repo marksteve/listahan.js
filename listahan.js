@@ -84,22 +84,55 @@ $.fn.listahan = function(optionsOrMethod) {
                                 overflowY: 'hidden',
                                 height: 'auto'
                             })
+                            .removeClass('left')
                             .appendTo($menu)
                             .show();
+
+                        // Get parent offsets
+                        var parentOffset = options.$parent.offset();
+                        if (parentOffset) {
+                            parentTop = parentOffset.top;
+                            parentLeft = parentOffset.left;
+                        } else {
+                            parentTop = options.$parent.scrollTop();
+                            parentLeft = options.$parent.scrollLeft();
+                        }
+
+                        if ($el.parents('ul').hasClass('left')) {
+                            // Current one is already left
+                            left = $el.offset().left - $submenu.outerWidth() - options.distance;
+                        } else {
+                            // Try to show aligned left
+                            left = $el.offset().left + $el.outerWidth() + options.distance;
+                        }
+                        $submenu.offset({
+                            left: left
+                        });
+                        // Check if there's right overflow
+                        var rightOverflow = $submenu.offset().left + $submenu.outerWidth() - parentLeft - options.$parent.width();
+                        if (rightOverflow > 0) {
+                            // Align right if there is
+                            $submenu
+                                .addClass('left')
+                                .offset({
+                                    left: $el.offset().left - $submenu.outerWidth()
+                                });
+                        }
+
                         var submenuBorderTop = parseInt($submenu.css('border-top-width'), 10);
                         var submenuBorderBot = parseInt($submenu.css('border-bottom-width'), 10);
                         var top = $el.offset().top - submenuBorderTop;
                         var outerHeight = $el.outerHeight();
+
                         // Try to show aligned top
-                        $submenu
-                            .offset({
-                                top: top,
-                                left: $el.offset().left + $el.outerWidth() + options.distance
-                            });
+                        $submenu.offset({
+                            top: top
+                        });
+
                         var overflow;
                         var topOverflow;
-                        var parentTop = options.$parent.offset() ? options.$parent.offset().top : options.$parent.scrollTop();
                         var botOverflow = $submenu.offset().top + $submenu.outerHeight() - (parentTop + options.$parent.outerHeight());
+
                         if (botOverflow > 0) {
                             // If bottom overflows, try to show aligned bottom
                             $submenu.offset({
