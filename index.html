@@ -45,6 +45,14 @@
         line-height: 24px;
         margin-left: 1em;
     }
+    #demo-parent {
+        background-color: #333;
+        border-radius: 0.5em;
+        height: 100px;
+        margin: 1em 0;
+        position: relative;
+        width: 100%;
+    }
 </style>
 </head>
 <body>
@@ -80,12 +88,18 @@
 <!-- /README.md -->
 
 <h2>Demo</h2>
-<p><a href="#" id="demo-link">Show menu</a></p>
+<ul>
+    <li><a href="#" id="demo-1">Randomly positioned menu with click callback</a></li>
+    <li>
+        <a href="#" id="demo-2">With parent</a>
+        <div id="demo-parent"></div>
+    </li>
+</ul>
 <code id="demo-source"></code>
 
 </section>
 <script id="demo-script">
-var data = [
+var demo1 = [
     {
         id: 1,
         parent: 0,
@@ -142,11 +156,39 @@ var data = [
         title: 'Test 2'
     },
 ];
+var demo2 = [
+    {
+        id: 1,
+        parent: 0,
+        title: 'Test'
+    },
+    {
+        id: 2,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 3,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 4,
+        parent: 1,
+        title: 'Test 2'
+    },
+    {
+        id: 5,
+        parent: 1,
+        title: 'Test 2'
+    }
+];
 
 $(function() {
-    $('#demo-link')
+    var $demo1 = $('#demo-1');
+    $demo1
         .listahan({
-            data: data,
+            menu: demo1,
             menuOpen: function($container) {
                 $container.offset({
                     top: Math.floor(Math.random() * 0.5  * $(document).height()),
@@ -169,11 +211,31 @@ $(function() {
             e.stopPropagation();
             $(this).listahan('show');
         });
-    // Hide container on click
     $(document).on('click', function(e) {
-        $('#demo-link').listahan('hide');
+        $demo1.listahan('hide');
     });
 
+    var $parent = $('#demo-parent');
+    var $demo2 = $('#demo-2');
+    $demo2
+        .listahan({
+            menu: demo2,
+            $parent: $parent,
+            menuInit: function($container) {
+                $container.appendTo($parent);
+            },
+            menuOpen: function($container) {
+                $container.css('top', 50);
+            }
+        })
+        .on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).listahan('show');
+        });
+    $parent.on('click', function(e) {
+        $demo2.listahan('hide');
+    })
 });
 
 </script>

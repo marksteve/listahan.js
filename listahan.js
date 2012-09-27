@@ -9,11 +9,14 @@ $.fn.listahan = function(optionsOrMethod) {
     }
 
     var options = $.extend({
-        $container: $('<div/>').attr('id', 'listahan'),
+        $container: $('<div/>').addClass('listahan').appendTo('body'),
+        $parent: $(window),
         root: 0,
         showDelay: 250,
         distance: 0,
         submenuClass: 'submenu',
+        menuInit: function($container) {
+        },
         menuOpen: function($container) {
         },
         menuItemHTML: function(item, $submenu, $submenus) {
@@ -42,12 +45,12 @@ $.fn.listahan = function(optionsOrMethod) {
     }
 
     // Get parents
-    $.each(options.data, function(i, item) {
+    $.each(options.menu, function(i, item) {
         parents.push(item.parent);
     });
 
     // Create submenus
-    $.each(options.data, function(i, item) {
+    $.each(options.menu, function(i, item) {
         var $submenu;
         $submenu = $submenus[item.parent] = $submenus[item.parent] || $('<ul/>').addClass(options.submenuClass);
         if ($.inArray(item.id, parents) > 0) {
@@ -87,7 +90,9 @@ $.fn.listahan = function(optionsOrMethod) {
                             })
                             .appendTo(options.$container)
                             .show();
-                        var top = $el.offset().top - parseInt($submenu.css('border-top-width'), 10);
+                        var submenuBorderTop = parseInt($submenu.css('border-top-width'), 10);
+                        var submenuBorderBot = parseInt($submenu.css('border-bottom-width'), 10);
+                        var top = $el.offset().top - submenuBorderTop;
                         var outerHeight = $el.outerHeight();
                         // Try to show aligned top
                         $submenu
@@ -97,13 +102,14 @@ $.fn.listahan = function(optionsOrMethod) {
                             });
                         var overflow;
                         var topOverflow;
-                        var botOverflow = $submenu.offset().top + $submenu.outerHeight() - $(window).height();
+                        var parentTop = options.$parent.offset() ? options.$parent.offset().top : options.$parent.scrollTop();
+                        var botOverflow = $submenu.offset().top + $submenu.outerHeight() - (parentTop + options.$parent.outerHeight());
                         if (botOverflow > 0) {
                             // If bottom overflows, try to show aligned bottom
                             $submenu.offset({
-                                top: top + outerHeight + parseInt($submenu.css('border-top-width'), 10) - $submenu.outerHeight()
+                                top: top + outerHeight - $submenu.outerHeight()
                             });
-                            topOverflow = 0 - $submenu.offset().top;
+                            topOverflow = parentTop - $submenu.offset().top;
                             // If top overflows too, use w/e is less
                             if (topOverflow > botOverflow) {
                                 overflow = botOverflow;
@@ -121,7 +127,7 @@ $.fn.listahan = function(optionsOrMethod) {
                             // Adjust height according to remaining height
                             if (topOverflow > 0 && botOverflow > 0) {
                                 $submenu
-                                    .height($submenu.height() - overflow)
+                                    .height($submenu.outerHeight() - overflow)
                                     .css('overflow-y', 'scroll');
                             }
                         }
@@ -139,29 +145,30 @@ $.fn.listahan = function(optionsOrMethod) {
             .appendTo($submenu);
     });
 
-    // Insert container
-    $('body').append(
-        options.$container
-            .css('position', 'absolute')
-            .hide()
-    );
+    // Hide container
+    options.$container
+        .css('position', 'absolute')
+        .hide()
 
     // Root menu
     var $root = $submenus[options.root]
         .css('position', 'absolute');
 
+    // Menu init callback
+    options.menuInit(options.$container);
+
     return this.each(function() {
         $(this)
             .on('show.listahan', function(e) {
+                // Show container
+                options.$container.show();
+                // Hide previously shown submenus
+                hideMenus(options.root);
+                // Menu open callback
+                options.menuOpen(options.$container);
+                // Append root menu
                 if (!$root.is(':visible')) {
-                    // Hide previously shown submenus
-                    hideMenus(options.root);
-                    // Show root menu
-                    options.$container
-                        .append($root)
-                        .show();
-                    // Menu open callback
-                    options.menuOpen(options.$container);
+                    options.$container.append($root)
                 }
             })
             .on('hide.listahan', function(e) {
