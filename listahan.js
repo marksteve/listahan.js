@@ -9,7 +9,6 @@ $.fn.listahan = function(optionsOrMethod) {
     }
 
     var options = $.extend({
-        $container: $('<div/>').addClass('listahan').appendTo('body'),
         $parent: $(window),
         root: 0,
         showDelay: 250,
@@ -27,6 +26,9 @@ $.fn.listahan = function(optionsOrMethod) {
         menuItemClick: function(item, $submenu, $submenus, e) {
         }
     }, optionsOrMethod);
+
+    // Create container if none was passed
+    options.$container = options.$container || $('<div/>').addClass('listahan').appendTo('body');
 
     var $submenus = {};
     var parents = [];
@@ -145,7 +147,7 @@ $.fn.listahan = function(optionsOrMethod) {
             .appendTo($submenu);
     });
 
-    // Hide container
+    // Hide container initially
     options.$container
         .css('position', 'absolute')
         .hide()
