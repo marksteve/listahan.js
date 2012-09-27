@@ -189,8 +189,8 @@ $(function() {
         .appendTo('body')
         .listahan({
             menu: demo1,
-            menuOpen: function($container) {
-                $container.offset({
+            menuOpen: function($menu) {
+                $menu.offset({
                     top: Math.floor(Math.random() * 0.5  * $(document).height()),
                     left: Math.floor(Math.random() * 0.5 * $(document).width())
                 });
@@ -222,11 +222,11 @@ $(function() {
         .listahan({
             menu: demo2,
             $parent: $parent,
-            menuInit: function($container) {
-                $container.appendTo($parent);
+            menuInit: function($menu) {
+                $menu.appendTo($parent);
             },
-            menuOpen: function($container) {
-                $container.css('top', 50);
+            menuOpen: function($menu) {
+                $menu.css('top', 50);
             }
         })
     $('#demo-2')
