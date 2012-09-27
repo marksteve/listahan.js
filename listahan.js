@@ -72,7 +72,7 @@ $.fn.listahan = function(optionsOrMethod) {
                 var parent = item.parent;
                 while (typeof parent != 'undefined') {
                     $el.siblings().removeClass('active');
-                    parent = $('li#' + parent)
+                    parent = $('li#' + parent, $menu)
                         .addClass('active')
                         .attr('parent');
                 }
