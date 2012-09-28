@@ -1,0 +1,8 @@
+{
+	"name": "listahan",
+	"version": "0.1.0",
+	"main": "listahan.js",
+	"dependencies": {
+		"jquery": ">=1.7"
+	}
+}
