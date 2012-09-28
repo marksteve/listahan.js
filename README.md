@@ -10,7 +10,6 @@ A really simple jQuery menu plugin.
 
 ## TODO
 
-* Horizontal resizing/moving
 * Improve data format and parsing
 * Improve API
 

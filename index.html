@@ -7,12 +7,13 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src="listahan.js"></script>
 <style>
+    body {
+        font: 12px sans-serif;
+        overflow: hidden;
+    }
     section {
         margin: 0 auto;
         width: 480px;
-    }
-    body {
-        font: 12px sans-serif;
     }
     code {
         background: #eee;
@@ -76,7 +77,6 @@
 <h2>TODO</h2>
 
 <ul>
-<li>Horizontal resizing/moving</li>
 <li>Improve data format and parsing</li>
 <li>Improve API</li>
 </ul>
@@ -191,8 +191,8 @@ $(function() {
             menu: demo1,
             menuOpen: function($menu) {
                 $menu.offset({
-                    top: Math.floor(Math.random() * 0.5  * $(document).height()),
-                    left: Math.floor(Math.random() * 0.5 * $(document).width())
+                    top: Math.floor(Math.random() * $(window).height()),
+                    left: Math.floor(Math.random() * $(window).width())
                 });
             },
             menuItemAdd: function(item, $submenu, $submenus) {
@@ -223,10 +223,9 @@ $(function() {
             menu: demo2,
             $parent: $parent,
             menuInit: function($menu) {
-                $menu.appendTo($parent);
-            },
-            menuOpen: function($menu) {
-                $menu.css('top', 50);
+                $menu
+                    .css('top', 50)
+                    .appendTo($parent);
             }
         })
     $('#demo-2')
