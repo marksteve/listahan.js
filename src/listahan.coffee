@@ -3,6 +3,7 @@ $.fn.listahan = (optionsOrMethod) ->
     if typeof optionsOrMethod == "string"
         this.each ->
             $(this).trigger optionsOrMethod + ".listahan"
+        return
 
     options = $.extend(
         $parent: $(window)
