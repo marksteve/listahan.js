@@ -176,12 +176,12 @@ $.fn.listahan = (optionsOrMethod) ->
             $menu.show()
             # Hide previously shown submenus
             hideMenus options.root
+            # Append root menu
+            unless $root.is(":visible")
+                $menu.append $root
             # Menu open callback
             menuOpen = $.proxy options.menuOpen, this
             menuOpen $menu
-            # Append root menu
-            if !$root.is(":visible")
-                $menu.append $root
             return
         )
         .on("hide.listahan", (e) ->
