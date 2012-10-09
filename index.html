@@ -3,25 +3,24 @@
 <head>
 <meta charset="utf-8">
 <title>listahan.js</title>
-<link href="css/normalize.css" rel="stylesheet">
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script src="listahan.js"></script>
+<link href="lib/normalize.css" rel="stylesheet">
+<link href="lib/prism.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="lib/prism.js"></script>
+<script src="lib/listahan.js"></script>
 <style>
     body {
         font: 12px sans-serif;
-        overflow: hidden;
+        overflow-x: hidden;
     }
     section {
         margin: 0 auto;
         width: 480px;
     }
-    code {
-        background: #eee;
-        display: block;
+    pre {
         height: 20em;
         overflow-y: auto;
         padding: 1em;
-        white-space: pre;
     }
     .submenu {
         background: white;
@@ -95,7 +94,7 @@
         <div id="demo-parent"></div>
     </li>
 </ul>
-<code id="demo-source"></code>
+<pre><code id="demo-source" class="language-javascript"></code></pre>
 
 </section>
 <script id="demo-script">
