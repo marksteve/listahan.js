@@ -1,6 +1,4 @@
-all: lib/listahan.js
-
-minify: lib/listahan.min.js
+all: lib/listahan.js lib/listahan.min.js
 
 lib/listahan.js: src/listahan.coffee
 	coffee -cs < $< | cat lib/mousetrap.js - > $@
