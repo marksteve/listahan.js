@@ -7,6 +7,7 @@ A really simple jQuery menu plugin.
 * Minimal configuration
 * Moves/resizes to available visible space
 * Callbacks
+* Keyboard movement
 
 ## TODO
 
