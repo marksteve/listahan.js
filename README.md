@@ -10,7 +10,6 @@ A really simple jQuery menu plugin.
 
 ## TODO
 
-* Keyboard support
 * Improve data format and parsing
 * Improve API
 

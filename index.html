@@ -36,7 +36,7 @@
         padding: 0 1em;
         white-space: nowrap;
     }
-    .submenu li:hover, .submenu li.active {
+    .submenu li.active {
         background: #eee;
     }
     .submenu li span {
@@ -100,85 +100,85 @@
 <script id="demo-script">
 var demo1 = [
     {
-        id: 1,
+        id: 'demo1-1',
         parent: 0,
         title: 'Test'
     },
     {
-        id: 2,
+        id: 'demo1-2',
         parent: 0,
         title: 'Test'
     },
     {
-        id: 200,
-        parent: 2,
+        id: 'demo1-200',
+        parent: 'demo1-2',
         title: 'Test 2'
     },
     {
-        id: 3,
-        parent: 1,
+        id: 'demo1-3',
+        parent: 'demo1-1',
         title: 'Test 2'
     },
     {
-        id: 4,
-        parent: 1,
+        id: 'demo1-4',
+        parent: 'demo1-1',
         title: 'Test 2'
     },
     {
-        id: 5,
-        parent: 3,
+        id: 'demo1-5',
+        parent: 'demo1-3',
         title: 'Test 3'
     },
     {
-        id: 6,
-        parent: 1,
+        id: 'demo1-6',
+        parent: 'demo1-1',
         title: 'Test 2'
     },
     {
-        id: 7,
-        parent: 1,
+        id: 'demo1-7',
+        parent: 'demo1-1',
         title: 'Test 2'
     },
     {
-        id: 8,
-        parent: 1,
+        id: 'demo1-8',
+        parent: 'demo1-1',
         title: 'Test 2'
     },
     {
-        id: 9,
-        parent: 1,
+        id: 'demo1-9',
+        parent: 'demo1-1',
         title: 'Test 2'
     },
     {
-        id: 10,
-        parent: 1,
+        id: 'demo1-10',
+        parent: 'demo1-1',
         title: 'Test 2'
     },
 ];
 var demo2 = [
     {
-        id: 1,
+        id: 'demo2-1',
         parent: 0,
         title: 'Test'
     },
     {
-        id: 2,
-        parent: 1,
+        id: 'demo2-2',
+        parent: 'demo2-1',
         title: 'Test 2'
     },
     {
-        id: 3,
-        parent: 1,
+        id: 'demo2-3',
+        parent: 'demo2-1',
         title: 'Test 2'
     },
     {
-        id: 4,
-        parent: 1,
+        id: 'demo2-4',
+        parent: 'demo2-1',
         title: 'Test 2'
     },
     {
-        id: 5,
-        parent: 1,
+        id: 'demo2-5',
+        parent: 'demo2-1',
         title: 'Test 2'
     }
 ];

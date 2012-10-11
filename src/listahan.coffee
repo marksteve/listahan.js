@@ -32,12 +32,86 @@ $.fn.listahan = (optionsOrMethod) ->
     hideMenus = (parent) ->
         $("li", $submenus[parent])
             .each( ->
-                $el = $(this).removeClass "active"
-                itemID = $el.attr "id"
+                itemID = $(this).attr "id"
                 if $submenus[itemID]
                     $submenus[itemID].hide()
                     hideMenus(itemID)
             )
+    showMenu = (item, $item) ->
+        # Show submenu
+        $submenu = $submenus[item.id]
+        if $submenu and !$submenu.is(":visible")
+            $submenu
+                .css(
+                    position: "absolute"
+                    overflowY: "hidden"
+                    height: "auto"
+                )
+                .removeClass("left")
+                .appendTo($menu)
+                .show()
+
+            # Remove existing active classes
+            $('li', $submenu).removeClass("active")
+
+            # Get parent offsets
+            parentOffset = options.$parent.offset()
+            if parentOffset
+                parentTop = parentOffset.top
+                parentLeft = parentOffset.left
+            else
+                parentTop = options.$parent.scrollTop()
+                parentLeft = options.$parent.scrollLeft()
+
+            if $item.parents("ul").hasClass("left")
+                # Current one is already left
+                left = $item.offset().left - $submenu.outerWidth() - options.distance
+            else
+                # Try to show aligned left
+                left = $item.offset().left + $item.outerWidth() + options.distance
+            $submenu.offset
+                left: left
+            # Check if there"s right overflow
+            rightOverflow = $submenu.offset().left + $submenu.outerWidth() - parentLeft - options.$parent.width()
+            if rightOverflow > 0
+                # Align right if there is
+                $submenu
+                    .addClass("left")
+                    .offset(left: $item.offset().left - $submenu.outerWidth())
+            submenuBorderTop = parseInt $submenu.css("border-top-width"), 10
+            submenuBorderBot = parseInt $submenu.css("border-bottom-width"), 10
+            top = $item.offset().top - submenuBorderTop
+            outerHeight = $item.outerHeight()
+
+            # Try to show aligned top
+            $submenu.offset
+                top: top
+
+            overflow = null
+            topOverflow = null
+            botOverflow = $submenu.offset().top + $submenu.outerHeight() - (parentTop + options.$parent.outerHeight())
+
+            if botOverflow > 0
+                # If bottom overflows, try to show aligned bottom
+                $submenu.offset
+                    top: top + outerHeight - $submenu.outerHeight()
+                topOverflow = parentTop - $submenu.offset().top
+                # If top overflows too, use w/e is less
+                if topOverflow > botOverflow
+                    overflow = botOverflow
+                    # Bottom shows more so revert top aligned top
+                    $submenu.offset
+                        top: top
+                else if topOverflow > 0
+                    overflow = topOverflow
+                    # Adjust considering overflow
+                    $submenu.offset
+                        top: $submenu.offset().top + overflow
+                # Adjust height according to remaining height
+                if topOverflow > 0 and botOverflow > 0
+                    $submenu
+                        .height($submenu.outerHeight() - overflow)
+                        .css("overflow-y", "scroll")
 
     # Get parents
     $.each options.menu, (i, item) ->
@@ -50,96 +124,30 @@ $.fn.listahan = (optionsOrMethod) ->
             item.hasChildren = true
         $menuItem = $("<li/>")
             .attr("id", item.id)
-            .attr("parent", item.parent)
+            .data("item", item)
             .on("mouseenter", (e) ->
                 clearTimeout(menuTimeout)
-                $el = $(this)
-                # Setup menu item active callback
-                menuItemActive = $.proxy options.menuItemActive, this
+                $item = $(this)
                 # Highlight menu items
                 parent = item.parent
                 while parent?
-                    $el.siblings().removeClass("active")
-                    parent = $("li#" + parent, $menu)
+                    $item
                         .addClass("active")
-                        .attr("parent")
+                        .siblings()
+                            .removeClass("active")
+                    $parent = $("li#" + parent, $menu)
+                        .addClass("active")
+                    parent = if $parent.size() then $parent.data("item").parent else null
+                # Set active item
+                $menu.data "active", $item.attr("id")
+                # Setup menu item active callback
+                menuItemActive = $.proxy options.menuItemActive, this
+                # Delay showing of menu
                 menuTimeout = setTimeout (->
                     # Hide submenus of higher level
                     hideMenus item.parent
                     # Show submenu
-                    $submenu = $submenus[item.id]
-                    if $submenu and !$submenu.is(":visible")
-                        $submenu
-                            .css(
-                                position: "absolute"
-                                overflowY: "hidden"
-                                height: "auto"
-                            )
-                            .removeClass("left")
-                            .appendTo($menu)
-                            .show()
-
-                        # Get parent offsets
-                        parentOffset = options.$parent.offset()
-                        if parentOffset
-                            parentTop = parentOffset.top
-                            parentLeft = parentOffset.left
-                        else
-                            parentTop = options.$parent.scrollTop()
-                            parentLeft = options.$parent.scrollLeft()
-
-                        if $el.parents("ul").hasClass("left")
-                            # Current one is already left
-                            left = $el.offset().left - $submenu.outerWidth() - options.distance
-                        else
-                            # Try to show aligned left
-                            left = $el.offset().left + $el.outerWidth() + options.distance
-                        $submenu.offset
-                            left: left
-                        # Check if there"s right overflow
-                        rightOverflow = $submenu.offset().left + $submenu.outerWidth() - parentLeft - options.$parent.width()
-                        if rightOverflow > 0
-                            # Align right if there is
-                            $submenu
-                                .addClass("left")
-                                .offset(
-                                    left: $el.offset().left - $submenu.outerWidth()
-                                )
-
-                        submenuBorderTop = parseInt $submenu.css("border-top-width"), 10
-                        submenuBorderBot = parseInt $submenu.css("border-bottom-width"), 10
-                        top = $el.offset().top - submenuBorderTop
-                        outerHeight = $el.outerHeight()
-
-                        # Try to show aligned top
-                        $submenu.offset
-                            top: top
-
-                        overflow = null
-                        topOverflow = null
-                        botOverflow = $submenu.offset().top + $submenu.outerHeight() - (parentTop + options.$parent.outerHeight())
-
-                        if botOverflow > 0
-                            # If bottom overflows, try to show aligned bottom
-                            $submenu.offset
-                                top: top + outerHeight - $submenu.outerHeight()
-                            topOverflow = parentTop - $submenu.offset().top
-                            # If top overflows too, use w/e is less
-                            if topOverflow > botOverflow
-                                overflow = botOverflow
-                                # Bottom shows more so revert top aligned top
-                                $submenu.offset
-                                    top: top
-                            else if topOverflow > 0
-                                overflow = topOverflow
-                                # Adjust considering overflow
-                                $submenu.offset
-                                    top: $submenu.offset().top + overflow
-                            # Adjust height according to remaining height
-                            if topOverflow > 0 and botOverflow > 0
-                                $submenu
-                                    .height($submenu.outerHeight() - overflow)
-                                    .css("overflow-y", "scroll")
+                    showMenu item, $item
                     # Menu item active callback
                     menuItemActive item, $submenu, $submenus
                     return
@@ -182,10 +190,68 @@ $.fn.listahan = (optionsOrMethod) ->
             # Menu open callback
             menuOpen = $.proxy options.menuOpen, this
             menuOpen $menu
+            # Keyboard events
+            ["up", "down", "left", "right"].forEach (dir) ->
+                Mousetrap.bind dir, (e) ->
+                    e.preventDefault()
+                    $menu.trigger dir + ".listahan"
+                    return
             return
         )
         .on("hide.listahan", (e) ->
             # Hide menu
             $menu.hide()
+            # Remove keyboard events
+            ["up", "down", "left", "right"].forEach (dir) ->
+                Mousetrap.unbind dir
+                return
+            return
+        )
+        .on("up.listahan", (e) ->
+            $item = $("#" + $menu.data("active"), $menu)
+            $prev = $item.prev()
+            if $prev.size()
+                hideMenus $item.data("item").parent
+                showMenu $prev.data("item"), $prev
+                $prev.addClass("active").siblings().removeClass("active")
+                $menu.data "active", $prev.attr("id")
+            return
+        )
+        .on("down.listahan", (e) ->
+            $item = $("#" + $menu.data("active"), $menu)
+            if $item.size()
+                $next = $item.next()
+            else
+                $next = $("li", $root).first()
+            if $next.size()
+                hideMenus $item.data("item").parent if $item.size()
+                showMenu $next.data("item"), $next
+                $next.addClass("active").siblings().removeClass("active")
+                $menu.data "active", $next.attr("id")
+            return
+        )
+        .on("left.listahan", (e) ->
+            $item = $("#" + $menu.data("active"), $menu)
+            item = $item.data("item")
+            $prev = $("#" + item.parent, $menu)
+            if $prev.size()
+                hideMenus item.parent
+                $prev.addClass("active")
+                $submenus[item.parent].hide()
+                $menu.data "active", $prev.attr("id")
+            return
+        )
+        .on("right.listahan", (e) ->
+            $item = $("#" + $menu.data("active"), $menu)
+            item = $item.data("item")
+            $submenu = $submenus[item.id]
+            unless $submenu?
+                return
+            $next = $('li', $submenu).first()
+            if $next.size()
+                showMenu item, $item
+                showMenu $next.data("item"), $next
+                $next.addClass("active")
+                $menu.data "active", $next.attr("id")
             return
         )
