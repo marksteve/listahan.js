@@ -1,8 +1,8 @@
-$.fn.listahan = (optionsOrMethod) ->
+$.fn.listahan = (optionsOrMethod, params...) ->
     # Method call
     if typeof optionsOrMethod == "string"
         this.each ->
-            $(this).trigger optionsOrMethod + ".listahan"
+            $(this).trigger optionsOrMethod + ".listahan", params
         return
 
     options = $.extend(
@@ -18,6 +18,8 @@ $.fn.listahan = (optionsOrMethod) ->
         menuItemAdd: (item, $submenu, $submenus) ->
             $(this).text item.title
             return
+        menuItemParent: (item, $submenu, $submenus) ->
+            return
         menuItemActive: (item, $submenu, $submenus) ->
             return
         menuItemClick: (item, $submenu, $submenus, e) ->
@@ -26,8 +28,6 @@ $.fn.listahan = (optionsOrMethod) ->
 
     $menu = $(this)
     $submenus = {}
-    parents = []
-    menuTimeout = null
 
     hideMenus = (parent) ->
         $("li", $submenus[parent])
@@ -37,6 +37,7 @@ $.fn.listahan = (optionsOrMethod) ->
                     $submenus[itemID].hide()
                     hideMenus(itemID)
             )
+    menuTimeout = null
     showMenu = (item, $item) ->
         # Show submenu
         $submenu = $submenus[item.id]
@@ -113,15 +114,29 @@ $.fn.listahan = (optionsOrMethod) ->
                         .height($submenu.outerHeight() - overflow)
                         .css("overflow-y", "scroll")
 
-    # Get parents
-    $.each options.menu, (i, item) ->
-        parents.push item.parent
+    items = {}
 
-    # Create submenus
-    $.each options.menu, (i, item) ->
-        $submenu = $submenus[item.parent] = $submenus[item.parent] or $("<ul/>").addClass options.submenuClass
-        if $.inArray(item.id, parents) > 0
-            item.hasChildren = true
+    for item in options.menu
+        items[item.id] = item
+
+    addMenuItem = (item) ->
+        items[item.id] = item
+        $submenu = $submenus[item.parent]
+
+        # New submenu
+        unless $submenu
+            $submenu = $submenus[item.parent] = $("<ul/>").addClass options.submenuClass
+
+            # Get parent element for context
+            parentItem = items[item.parent]
+            parentSubmenu = parentItem?.parent or options.root
+            $parentSubmenu = $submenus[parentSubmenu]
+            $parentMenuItem = $("#" + item.parent, $submenus[parentSubmenu])
+
+            # Proclaim parenthood!
+            menuItemParent = $.proxy options.menuItemParent, $parentMenuItem
+            menuItemParent parentItem or 'root', $parentSubmenu, $submenus
+
         $menuItem = $("<li/>")
             .attr("id", item.id)
             .data("item", item)
@@ -161,10 +176,15 @@ $.fn.listahan = (optionsOrMethod) ->
                 return
             )
             .appendTo($submenu)
+
         # Menu item add callback
         menuItemAdd = $.proxy options.menuItemAdd, $menuItem
         menuItemAdd item, $submenu, $submenus
+
         return
+
+    # Add menu items
+    addMenuItem(item) for item in options.menu
 
     # Hide menu initially
     $menu
@@ -175,10 +195,21 @@ $.fn.listahan = (optionsOrMethod) ->
     $root = $submenus[options.root]
         .css("position", "absolute")
 
+    # Bind data
+    $menu.data('options', options)
+    $menu.data('$submenus', $submenus)
+
     # Menu init callback
     options.menuInit $menu
 
     $menu
+        .on("add.listahan", (e, item) ->
+            addMenuItem item
+            )
+        .on("clear.listahan", (e, parent) ->
+            if $submenus[parent]?
+                $submenus[parent].empty()
+            )
         .on("show.listahan", (e) ->
             # Show menu
             $menu.show()
@@ -197,7 +228,7 @@ $.fn.listahan = (optionsOrMethod) ->
                     $menu.trigger dir + ".listahan"
                     return
             return
-        )
+            )
         .on("hide.listahan", (e) ->
             # Hide menu
             $menu.hide()
@@ -206,7 +237,7 @@ $.fn.listahan = (optionsOrMethod) ->
                 Mousetrap.unbind dir
                 return
             return
-        )
+            )
         .on("up.listahan", (e) ->
             $item = $("#" + $menu.data("active"), $menu)
             $prev = $item.prev()
@@ -216,7 +247,7 @@ $.fn.listahan = (optionsOrMethod) ->
                 $prev.addClass("active").siblings().removeClass("active")
                 $menu.data "active", $prev.attr("id")
             return
-        )
+            )
         .on("down.listahan", (e) ->
             $item = $("#" + $menu.data("active"), $menu)
             if $item.size()
@@ -229,7 +260,7 @@ $.fn.listahan = (optionsOrMethod) ->
                 $next.addClass("active").siblings().removeClass("active")
                 $menu.data "active", $next.attr("id")
             return
-        )
+            )
         .on("left.listahan", (e) ->
             $item = $("#" + $menu.data("active"), $menu)
             item = $item.data("item")
@@ -240,7 +271,7 @@ $.fn.listahan = (optionsOrMethod) ->
                 $submenus[item.parent].hide()
                 $menu.data "active", $prev.attr("id")
             return
-        )
+            )
         .on("right.listahan", (e) ->
             $item = $("#" + $menu.data("active"), $menu)
             item = $item.data("item")
@@ -254,4 +285,4 @@ $.fn.listahan = (optionsOrMethod) ->
                 $next.addClass("active")
                 $menu.data "active", $next.attr("id")
             return
-        )
+            )

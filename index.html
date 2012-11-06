@@ -185,7 +185,7 @@ var demo2 = [
 ];
 
 $(function() {
-    var $demo1 = $('<div/>')
+    window.$demo1 = $('<div/>')
         .appendTo('body')
         .listahan({
             menu: demo1,
@@ -217,7 +217,7 @@ $(function() {
     });
 
     var $parent = $('#demo-parent');
-    var $demo2 = $('<div/>')
+    window.$demo2 = $('<div/>')
         .appendTo('body')
         .listahan({
             menu: demo2,
