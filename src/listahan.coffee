@@ -1,8 +1,8 @@
 $.fn.listahan = (optionsOrMethod, params...) ->
     # Method call
     if typeof optionsOrMethod == "string"
-        this.each ->
-            $(this).trigger optionsOrMethod + ".listahan", params
+        @.each ->
+            $(@).trigger optionsOrMethod + ".listahan", params
         return
 
     options = $.extend(
@@ -16,7 +16,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
         menuOpen: ($menu) ->
             return
         menuItemAdd: (item, $submenu, $submenus) ->
-            $(this).text item.title
+            $(@).text item.title
             return
         menuItemParent: (item, $submenu, $submenus) ->
             return
@@ -26,17 +26,18 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             return
     , optionsOrMethod)
 
-    $menu = $(this)
+    $menu = $(@)
     $submenus = {}
 
     hideMenus = (parent) ->
         $("li", $submenus[parent])
             .each( ->
-                itemID = $(this).attr "id"
+                itemID = $(@).attr "id"
                 if $submenus[itemID]
                     $submenus[itemID].hide()
                     hideMenus(itemID)
             )
+
     menuTimeout = null
     showMenu = (item, $item) ->
         # Show submenu
@@ -142,7 +143,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             .data("item", item)
             .on("mouseenter", (e) ->
                 clearTimeout(menuTimeout)
-                $item = $(this)
+                $item = $(@)
                 # Highlight menu items
                 parent = item.parent
                 while parent?
@@ -156,7 +157,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                 # Set active item
                 $menu.data "active", $item.attr("id")
                 # Setup menu item active callback
-                menuItemActive = $.proxy options.menuItemActive, this
+                menuItemActive = $.proxy options.menuItemActive, @
                 # Delay showing of menu
                 menuTimeout = setTimeout (->
                     # Hide submenus of higher level
@@ -171,7 +172,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             )
             .on("click", (e) ->
                 # Menu item click callback
-                menuItemClick = $.proxy options.menuItemClick, this
+                menuItemClick = $.proxy options.menuItemClick, @
                 menuItemClick item, $submenu, $submenus, e
                 return
             )
@@ -185,6 +186,20 @@ $.fn.listahan = (optionsOrMethod, params...) ->
 
     # Add menu items
     addMenuItem(item) for item in options.menu
+
+    # Func to remove menu item recursively
+    removeMenuItem = (item) ->
+        # Remove item
+        $("##{item.id}", $submenus[item.parent]).remove()
+        # Then its submenus
+        $submenu = $submenus[item.id]
+        if $submenu?
+            $("li", $submenu).each ->
+                $item = $(@)
+                removeMenuItem($item.data("item"))
+                $item.remove()
+            $submenu.remove()
+        return
 
     # Hide menu initially
     $menu
@@ -205,10 +220,16 @@ $.fn.listahan = (optionsOrMethod, params...) ->
     $menu
         .on("add.listahan", (e, item) ->
             addMenuItem item
+            return
+            )
+        .on("remove.listahan", (e, item) ->
+            removeMenuItem item
+            return
             )
         .on("clear.listahan", (e, parent) ->
             if $submenus[parent]?
                 $submenus[parent].empty()
+            return
             )
         .on("show.listahan", (e) ->
             # Show menu
@@ -219,7 +240,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             unless $root.is(":visible")
                 $menu.append $root
             # Menu open callback
-            menuOpen = $.proxy options.menuOpen, this
+            menuOpen = $.proxy options.menuOpen, @
             menuOpen $menu
             # Keyboard events
             ["up", "down", "left", "right"].forEach (dir) ->
