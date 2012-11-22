@@ -99,96 +99,29 @@
 
 </section>
 <script id="demo-script">
-var demo1 = [
-    {
-        id: 'demo1-1',
-        parent: 0,
-        title: 'Test'
-    },
-    {
-        id: 'demo1-2',
-        parent: 0,
-        title: 'Test'
-    },
-    {
-        id: 'demo1-200',
-        parent: 'demo1-2',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo1-3',
-        parent: 'demo1-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo1-4',
-        parent: 'demo1-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo1-5',
-        parent: 'demo1-3',
-        title: 'Test 3'
-    },
-    {
-        id: 'demo1-6',
-        parent: 'demo1-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo1-7',
-        parent: 'demo1-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo1-8',
-        parent: 'demo1-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo1-9',
-        parent: 'demo1-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo1-10',
-        parent: 'demo1-1',
-        title: 'Test 2'
-    },
-];
-var demo2 = [
-    {
-        id: 'demo2-1',
-        parent: 0,
-        title: 'Test'
-    },
-    {
-        id: 'demo2-2',
-        parent: 'demo2-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo2-3',
-        parent: 'demo2-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo2-4',
-        parent: 'demo2-1',
-        title: 'Test 2'
-    },
-    {
-        id: 'demo2-5',
-        parent: 'demo2-1',
-        title: 'Test 2'
-    }
-];
-
 $(function() {
+    function genMenu(itemsCount) {
+        var menu = [];
+        var hasRoot = false;
+        for (var i = 0; i < itemsCount; i++) {
+            var item = {
+                id: 'demo-' + i,
+                title: 'Menu Item #' + i
+            };
+            if (!hasRoot || Math.random() > 0.9) {
+                item.parent = 0;
+                hasRoot = true;
+            } else {
+                item.parent = 'demo-' + Math.floor(Math.random() * i);
+            }
+            menu.push(item);
+        }
+        return menu;
+    }
     window.$demo1 = $('<div/>')
         .appendTo('body')
         .listahan({
-            menu: demo1,
+            menu: genMenu(100),
             menuOpen: function($menu) {
                 $menu.offset({
                     top: Math.floor(Math.random() * $(window).height()),
@@ -220,7 +153,7 @@ $(function() {
     window.$demo2 = $('<div/>')
         .appendTo('body')
         .listahan({
-            menu: demo2,
+            menu: genMenu(5),
             $parent: $parent,
             menuInit: function($menu) {
                 $menu
