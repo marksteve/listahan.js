@@ -55,7 +55,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             # Remove existing active classes
             $('li', $submenu).removeClass("active")
 
-            # Get parent offsets
+            # Get parent attributes
             parentOffset = options.$parent.offset()
             if parentOffset
                 parentTop = parentOffset.top
@@ -63,17 +63,32 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             else
                 parentTop = options.$parent.scrollTop()
                 parentLeft = options.$parent.scrollLeft()
+            parentWidth = options.$parent.outerWidth()
+            parentHeight = options.$parent.outerHeight()
+
+            # Submenu attributes
+            smBorderTop = parseInt $submenu.css("border-top-width"), 10
+            smBorderBottom = parseInt $submenu.css("border-bottom-width"), 10
+            smLeft = $submenu.offset().left
+            smWidth = $submenu.outerWidth()
+            smHeight = $submenu.outerHeight()
+
+            # Item
+            itemTop = $item.offset().top - smBorderTop
+            itemLeft = $item.offset().left
+            itemWidth = $item.outerWidth()
+            itemHeight = $item.outerHeight()
 
             alignLeft = ->
                 $submenu
                     .removeClass("left")
-                    .offset(left: $item.offset().left + $item.outerWidth() + options.distance)
+                    .offset(left: itemLeft + itemWidth + options.distance)
                 return
 
             alignRight = ->
                 $submenu
                     .addClass("left")
-                    .offset(left: $item.offset().left - $submenu.outerWidth() - options.distance)
+                    .offset(left: itemLeft - smWidth - options.distance)
                 return
 
             # Check menu direction
@@ -85,45 +100,42 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                 # Try to show aligned left
                 alignLeft()
                 # Check if there's right overflow
-                rightOverflow = $submenu.offset().left + $submenu.outerWidth() - parentLeft - options.$parent.width()
+                rightOverflow = smLeft + smWidth - parentLeft - parentWidth
                 if rightOverflow > 0
                     # Align right if there is
                     alignRight()
 
-            # Common attributes
-            submenuBorderTop = parseInt $submenu.css("border-top-width"), 10
-            submenuBorderBot = parseInt $submenu.css("border-bottom-width"), 10
-            top = $item.offset().top - submenuBorderTop
-            outerHeight = $item.outerHeight()
-
             # Try to show aligned top
             $submenu.offset
-                top: top
+                top: itemTop
 
-            overflow = null
-            topOverflow = null
-            botOverflow = $submenu.offset().top + $submenu.outerHeight() - (parentTop + options.$parent.outerHeight())
-
+            # Check bottom overflow
+            botOverflow = itemTop + smHeight - parentTop - parentHeight
             if botOverflow > 0
-                # If bottom overflows, try to show aligned bottom
-                $submenu.offset
-                    top: top + outerHeight - $submenu.outerHeight()
-                topOverflow = parentTop - $submenu.offset().top
-                # If top overflows too, use w/e is less
+                # Check top overflow if bottom aligned
+                # If overflows at top too, use w/e is less
+                botAlignedTop = itemTop + itemHeight + smBorderTop + smBorderBottom - smHeight
+                topOverflow = parentTop - botAlignedTop
+
+                yOverflow = 0
+
                 if topOverflow > botOverflow
-                    overflow = botOverflow
-                    # Bottom shows more so revert top aligned top
+                    # Bottom shows more so do top aligned
+                    yOverflow = botOverflow
                     $submenu.offset
-                        top: top
-                else if topOverflow > 0
-                    overflow = topOverflow
-                    # Adjust considering overflow
+                        top: itemTop
+
+                else
+                    # Else do bottom aligned
+                    if topOverflow > 0
+                        yOverflow = topOverflow
                     $submenu.offset
-                        top: $submenu.offset().top + overflow
+                        top: botAlignedTop - yOverflow
+
                 # Adjust height according to remaining height
-                if topOverflow > 0 and botOverflow > 0
+                if yOverflow > 0
                     $submenu
-                        .height($submenu.outerHeight() - overflow)
+                        .height(smHeight - yOverflow)
                         .css("overflow-y", "scroll")
 
     items = {}
