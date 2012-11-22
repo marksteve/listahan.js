@@ -1,3 +1,4 @@
+# TODO: Fix active items
 $.fn.listahan = (optionsOrMethod, params...) ->
     # Method call
     if typeof optionsOrMethod == "string"
@@ -69,7 +70,6 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             # Submenu attributes
             smBorderTop = parseInt $submenu.css("border-top-width"), 10
             smBorderBottom = parseInt $submenu.css("border-bottom-width"), 10
-            smLeft = $submenu.offset().left
             smWidth = $submenu.outerWidth()
             smHeight = $submenu.outerHeight()
 
@@ -80,10 +80,11 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             itemHeight = $item.outerHeight()
 
             alignLeft = ->
+                left = itemLeft + itemWidth + options.distance
                 $submenu
                     .removeClass("left")
-                    .offset(left: itemLeft + itemWidth + options.distance)
-                return
+                    .offset(left: left)
+                left
 
             alignRight = ->
                 $submenu
@@ -98,7 +99,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                 # TODO: Check left overflow
             else
                 # Try to show aligned left
-                alignLeft()
+                smLeft = alignLeft()
                 # Check if there's right overflow
                 rightOverflow = smLeft + smWidth - parentLeft - parentWidth
                 if rightOverflow > 0
