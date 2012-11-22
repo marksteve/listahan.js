@@ -49,7 +49,6 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                     overflowY: "hidden"
                     height: "auto"
                 )
-                .removeClass("left")
                 .appendTo($menu)
                 .show()
 
@@ -65,21 +64,33 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                 parentTop = options.$parent.scrollTop()
                 parentLeft = options.$parent.scrollLeft()
 
-            if $item.parents("ul").hasClass("left")
-                # Current one is already left
-                left = $item.offset().left - $submenu.outerWidth() - options.distance
-            else
-                # Try to show aligned left
-                left = $item.offset().left + $item.outerWidth() + options.distance
-            $submenu.offset
-                left: left
-            # Check if there"s right overflow
-            rightOverflow = $submenu.offset().left + $submenu.outerWidth() - parentLeft - options.$parent.width()
-            if rightOverflow > 0
-                # Align right if there is
+            alignLeft = ->
+                $submenu
+                    .removeClass("left")
+                    .offset(left: $item.offset().left + $item.outerWidth() + options.distance)
+                return
+
+            alignRight = ->
                 $submenu
                     .addClass("left")
-                    .offset(left: $item.offset().left - $submenu.outerWidth())
+                    .offset(left: $item.offset().left - $submenu.outerWidth() - options.distance)
+                return
+
+            # Check menu direction
+            if $item.parents("ul").hasClass("left")
+                # Going left
+                alignRight()
+                # TODO: Check left overflow
+            else
+                # Try to show aligned left
+                alignLeft()
+                # Check if there's right overflow
+                rightOverflow = $submenu.offset().left + $submenu.outerWidth() - parentLeft - options.$parent.width()
+                if rightOverflow > 0
+                    # Align right if there is
+                    alignRight()
+
+            # Common attributes
             submenuBorderTop = parseInt $submenu.css("border-top-width"), 10
             submenuBorderBot = parseInt $submenu.css("border-bottom-width"), 10
             top = $item.offset().top - submenuBorderTop
