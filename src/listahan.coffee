@@ -1,4 +1,3 @@
-# TODO: Fix active items
 $.fn.listahan = (optionsOrMethod, params...) ->
     # Method call
     if typeof optionsOrMethod == "string"
@@ -54,7 +53,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                 .show()
 
             # Remove existing active classes
-            $('li', $submenu).removeClass("active")
+            $("li", $submenu).removeClass("active")
 
             # Get parent attributes
             parentOffset = options.$parent.offset()
@@ -168,20 +167,26 @@ $.fn.listahan = (optionsOrMethod, params...) ->
             .on("mouseenter", (e) ->
                 clearTimeout(menuTimeout)
                 $item = $(@)
+
                 # Highlight menu items
+                $item
+                    .addClass("active")
+                    .siblings()
+                        .removeClass("active")
                 parent = item.parent
                 while parent?
-                    $item
+                    $parent = $("li#" + parent, $menu)
                         .addClass("active")
                         .siblings()
                             .removeClass("active")
-                    $parent = $("li#" + parent, $menu)
-                        .addClass("active")
                     parent = if $parent.size() then $parent.data("item").parent else null
+
                 # Set active item
                 $menu.data "active", $item.attr("id")
+
                 # Setup menu item active callback
                 menuItemActive = $.proxy options.menuItemActive, @
+
                 # Delay showing of menu
                 menuTimeout = setTimeout (->
                     # Hide submenus of higher level
@@ -192,6 +197,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                     menuItemActive item, $submenu, $submenus
                     return
                 ), options.showDelay
+
                 return
             )
             .on("click", (e) ->
