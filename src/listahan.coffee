@@ -130,7 +130,7 @@ $.fn.listahan = (optionsOrMethod, params...) ->
                     if topOverflow > 0
                         yOverflow = topOverflow
                     $submenu.offset
-                        top: botAlignedTop - yOverflow
+                        top: botAlignedTop + yOverflow
 
                 # Adjust height according to remaining height
                 if yOverflow > 0
